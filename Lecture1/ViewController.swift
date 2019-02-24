@@ -12,36 +12,42 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    lazy var game = Concentration(numberOfPairsOfCards: (cardButtons.count + 1)/2)
-    var emojiChoicees = ["😱","💜","🏀","🐗","🐍","🙋🏻‍♀","🥶","☠️"]
+    private lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)
+    
+    var numberOfPairsOfCards: Int{
+        return (cardButtons.count+1) / 2
+    }
+    
+    
+    private var emojiChoicees = ["😱","💜","🏀","🐗","🐍","🙋🏻‍♀","🥶","☠️"]
 
     
-    var emojiTheme = ["😎","😱","😤","🤥","😂","😒","😶","🤔"];
-    var animalTheme = [ "🐷","🦁","🦅","🦋","🐘","🦀","🐢","🐠"];
-    var fruitTheme = [ "🍉","🍓","🍅","🥝","🍋","🍇","🍍","🍏"];
-    var ballTheme = [ "⚽","🏀","🏈","⚾","🎾","🏐","🏉","🎱"];
-    var vehicleTheme = [ "🚗","🚌","⛵","🛳","✈","🚀","🚡","🚅"];
-    var heartTheme = [ "❤","🧡","💛","💚","💙","💜","🖤","💔"];
-    var themeArray: [[String]] = []
+    private var emojiTheme = ["😎","😱","😤","🤥","😂","😒","😶","🤔"];
+    private var animalTheme = [ "🐷","🦁","🦅","🦋","🐘","🦀","🐢","🐠"];
+    private var fruitTheme = [ "🍉","🍓","🍅","🥝","🍋","🍇","🍍","🍏"];
+    private var ballTheme = [ "⚽","🏀","🏈","⚾","🎾","🏐","🏉","🎱"];
+    private var vehicleTheme = [ "🚗","🚌","⛵","🛳","✈","🚀","🚡","🚅"];
+    private var heartTheme = [ "❤","🧡","💛","💚","💙","💜","🖤","💔"];
+    private var themeArray: [[String]] = []
     
-    var flipCount = 0{
+    private(set) var flipCount = 0{
         didSet{
             flipCountLabel.text = "Flips: \(flipCount)"
         }
     }
     
     
-    @IBOutlet var cardButtons: [UIButton]!
-    @IBOutlet weak var flipCountLabel: UILabel!
-    @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet private var cardButtons: [UIButton]!
+    @IBOutlet private weak var flipCountLabel: UILabel!
+    @IBOutlet private weak var scoreLabel: UILabel!
     
-    @IBAction func startNewGame(_ sender: Any) {
+    @IBAction private func startNewGame(_ sender: Any) {
         createNewGame()
     }
     
 
     
-    @IBAction func touchCard(_ sender: UIButton) {
+    @IBAction private func touchCard(_ sender: UIButton) {
         flipCount += 1
         if let cardNumber = cardButtons.index(of: sender){
             game.chooseCard(at: cardNumber)
@@ -52,7 +58,7 @@ class ViewController: UIViewController {
         scoreLabel.text = "Score: \(game.score)"
     }
 
-    func updateViewFromModel(){
+    private func updateViewFromModel(){
         for index in cardButtons.indices{
             let button = cardButtons[index]
             let card = game.cards[index]
@@ -67,31 +73,42 @@ class ViewController: UIViewController {
         }
     }
     
-    var emoji = [Int:String]()
+    private var emoji = [Int:String]()
 
-    func emoji(for card: Card) -> String {
+    private func emoji(for card: Card) -> String {
         if emoji[card.identifier] == nil, emojiChoicees.count > 0 {
-            let randomIndex = Int(arc4random_uniform(UInt32(emojiChoicees.count)))
-            emoji[card.identifier] = emojiChoicees.remove(at: randomIndex)
+            emoji[card.identifier] = emojiChoicees.remove(at: emojiChoicees.count.arc4random)
         }
         return emoji[card.identifier] ?? "?"
     }
     
-    func createNewGame(){
+    private func createNewGame(){
         themeArray = [emojiTheme, animalTheme, fruitTheme, vehicleTheme, heartTheme, ballTheme]
-        let randomIndex = Int(arc4random_uniform(UInt32(themeArray.count)))
-        emojiChoicees = themeArray[randomIndex]
+        emojiChoicees = themeArray[themeArray.count.arc4random]
         game = Concentration(numberOfPairsOfCards: (cardButtons.count + 1)/2)
         flipCount = 0
         clearButtons()
     }
     
-    func clearButtons(){
+    private func clearButtons(){
         for card in cardButtons{
             card.setTitle("", for: UIControl.State.normal)
             card.backgroundColor = #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
         }
     }
     
+}
+
+extension Int {
+    var arc4random: Int {
+        if self > 0 {
+          return Int(arc4random_uniform(UInt32(self)))
+        } else if self < 0 {
+            return -Int(arc4random_uniform(UInt32(abs(self))))
+        } else {
+            return 0
+        }
+        
+    }
 }
 
