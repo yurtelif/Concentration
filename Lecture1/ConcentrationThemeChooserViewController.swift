@@ -8,8 +8,11 @@
 
 import UIKit
 
-class ConcentrationThemeChooserViewController: UIViewController, UISplitViewControllerDelegate {
+class ConcentrationThemeChooserViewController: VCLLoggingViewController, UISplitViewControllerDelegate {
 
+    override var vcLoggingName: String {
+        return "ThemeChooser"
+    }
 
     let themes = [
         "Fruits":"🍉🍓🍅🥝🍋🍇🍍🍏",
@@ -18,6 +21,7 @@ class ConcentrationThemeChooserViewController: UIViewController, UISplitViewCont
     ]
     
     override func awakeFromNib() {
+        super.awakeFromNib()
         splitViewController?.delegate = self
     }
     
